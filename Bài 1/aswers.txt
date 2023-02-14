@@ -1,0 +1,129 @@
+Câu 2:
+//Show student by id
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+WHERE school_students.student_id = 2
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+//Show all Students
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+
+Câu 3:
+3a Điều kiện điểm trung bình >=8.0,
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+HAVING  AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6)>=8
+3b Điều kiện có ít nhất một môn >=8.0
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+WHERE student_scores.subject_title IN ('Toán ','Ngữ Văn','Tiếng Anh') AND (student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6>= 8.0
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+c, không có môn nào dưới 6.5
+
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+HAVING MIN((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) >= 6.5
+
+
+=>danh sách học sinh tiên tiến xuất sắc
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+WHERE student_scores.subject_title IN ('Toán ','Ngữ Văn','Tiếng Anh') AND (student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6>= 8.0
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+HAVING MIN((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) >= 6.5
+INTERSECT
+SELECT 
+       school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year,
+       school_students.class, 
+       AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6) AS avg_score
+FROM student_scores
+JOIN school_students ON student_scores.student_id = school_students.student_id
+JOIN SCHOOL ON school_students.school_id = SCHOOL.school_id 
+GROUP BY school_students.student_id, SCHOOL.school_name, school_students.student_name, school_students.school_year, school_students.class
+HAVING  AVG((student_scores.test_score_15 + student_scores.test_score_45*2 + student_scores.test_score_semester*3)/6)>=8
+
+
+//Create Table
+
+CREATE DATABASE SCHOOL_MANAGEMENT;
+USE SCHOOL_MANAGEMENT;
+CREATE TABLE SCHOOL(
+    school_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    school_name VARCHAR(255),
+    level_school VARCHAR(255),
+    principal VARCHAR(255) UNIQUE
+    number_of_school_year INT ,
+);
+
+CREATE TABLE school_students(
+    student_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    student_name VARCHAR(255), 
+    class INT,
+    school_year INT ,
+    school_id INT,
+    FOREIGN KEY(school_id) REFERENCES SCHOOL(school_id)
+);
+CREATE TABLE school_teachers(
+    teacher_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    teacher_name VARCHAR(20), 
+    subject VARCHAR(15),
+    school_id INT,
+    FOREIGN KEY(school_id) REFERENCES SCHOOL(school_id)
+);
+CREATE TABLE student_scores(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    subject_title VARCHAR(20), 
+    subject VARCHAR(15),
+    teacher_id INT,
+    FOREIGN KEY(teacher_id) REFERENCES school_teachers(teacher_id),
+     student_id INT,
+    FOREIGN KEY(student_id ) REFERENCES school_students(student_id )
+);
+CREATE TABLE student_scores(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    subject_title VARCHAR(20), 
+    test_score_15 INT, 
+    test_score_45 INT, 
+    test_score_semester INT, 
+    teacher_id INT,
+    FOREIGN KEY(teacher_id) REFERENCES school_teachers(teacher_id),
+     student_id INT,
+    FOREIGN KEY(student_id ) REFERENCES school_students(student_id )
+);
+
+
+
+
